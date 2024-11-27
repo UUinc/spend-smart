@@ -23,17 +23,39 @@ namespace SpendSmart.Controllers
 
         public IActionResult Expenses()
         {
+            var allExpenses = _context.Expenses.ToList();
+            return View(allExpenses);
+        }
+
+        public IActionResult CreateEditExpense(int? id)
+        {
+            if (id != null)
+            {
+                var expenseInDb = _context.Expenses.SingleOrDefault(expense => expense.Id == id);
+                return View(expenseInDb);
+            }    
+
             return View();
         }
 
-        public IActionResult CreateEditExpense()
+        public IActionResult DeleteExpense(int id)
         {
-            return View();
+            var expenseInDb = _context.Expenses.SingleOrDefault(expense => expense.Id == id);
+            _context.Expenses.Remove(expenseInDb);
+            _context.SaveChanges();
+            return RedirectToAction("Expenses");
         }
 
         public IActionResult CreateEditExpenseForm(Expense model)
         {
-            _context.Expenses.Add(model);
+            if (model.Id == 0)
+            {
+                _context.Expenses.Add(model);
+            }
+            else
+            {
+                _context.Expenses.Update(model);
+            }
             _context.SaveChanges();
             return RedirectToAction("Expenses");
         }
